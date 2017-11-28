@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_login"
+            android:icon="@drawable/ic_login"
+            android:title="Login" />
+        <item
+            android:id="@+id/nav_start"
+            android:icon="@drawable/ic_start"
+            android:title="Start" />
+    </group>
+
+    <item android:title="About Us">
+        <menu>
+            <item
+                android:id="@+id/nav_description"
+                android:icon="@drawable/ic_description"
+                android:title="Description" />
+            <item
+                android:id="@+id/nav_license"
+                android:icon="@drawable/ic_license"
+                android:title="License" />
+            <item
+                android:id="@+id/nav_tosa"
+                android:icon="@drawable/ic_tosa"
+                android:title="Terms of Service Agreement" />
+            <item
+                android:id="@+id/nav_contact_us"
+                android:icon="@drawable/ic_contact_us"
+                android:title="Contact Us" />
+        </menu>
+    </item>
+
+</menu>

@@ -1,0 +1,16 @@
+<resources>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+
+    <style name="MySpinnerTimePickerStyle" parent="android:Theme.Material.Dialog">
+        <item name="android:timePickerStyle">@style/MySpinnerTimePicker</item>
+    </style>
+
+    <style name="MySpinnerTimePicker" parent="android:Widget.Material.TimePicker">
+        <item name="android:timePickerMode">spinner</item>
+    </style>
+</resources>
