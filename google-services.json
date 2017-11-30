@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "482478944950",
+    "firebase_url": "https://quick-destinatio-1509470628706.firebaseio.com",
+    "project_id": "quick-destinatio-1509470628706",
+    "storage_bucket": "quick-destinatio-1509470628706.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:482478944950:android:bf3c463f94a6720c",
+        "android_client_info": {
+          "package_name": "com.quickd.quickdestinations"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "482478944950-iph66eu538vca27tpcqb7uq7sgdg35e3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.quickd.quickdestinations",
+            "certificate_hash": "f4d23b07ee4269278436c4d59d684b66009a855c"
+          }
+        },
+        {
+          "client_id": "482478944950-mubbgehol2d1u6hh7ndgjopj672ni615.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAnB3oDhHzATm5g8WKtsa44Xp1ks9fETVI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "482478944950-mubbgehol2d1u6hh7ndgjopj672ni615.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

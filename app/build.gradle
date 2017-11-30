@@ -26,12 +26,18 @@ dependencies {
     implementation 'com.android.support:design:26.1.0'
     implementation 'com.android.support:support-v4:26.1.0'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
-    implementation 'com.google.android.gms:play-services-maps:11.4.2'
-    implementation 'com.google.android.gms:play-services:11.4.2'
+    implementation 'com.google.android.gms:play-services-maps:11.6.0'
+    implementation 'com.google.android.gms:play-services:11.6.0'
     implementation 'com.google.code.gson:gson:2.8.2'
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
     implementation 'com.squareup.okhttp3:okhttp:3.9.0'
+    implementation 'com.google.firebase:firebase-auth:11.6.0'
+    implementation 'com.android.volley:volley:1.0.0'
+    implementation 'com.google.android.gms:play-services-games:11.6.0'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 }
+
+
+apply plugin: 'com.google.gms.google-services'
