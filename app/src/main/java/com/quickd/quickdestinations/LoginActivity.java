@@ -38,6 +38,8 @@ public class LoginActivity extends AppCompatActivity
         fragmentTransaction.replace(R.id.screen_area, fragment);
         fragmentTransaction.commit();
 
+        latLngs.add(null);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -137,9 +139,12 @@ public class LoginActivity extends AppCompatActivity
         return latLngs;
     }
 
+    public void setCurrentLocation(LatLng latLng) {
+        latLngs.set(0, latLng);
+    }
+
     public void setLatLngs(LatLng latLng) {
         latLngs.add(latLng);
-        Toast.makeText(this, "Added " + latLng.latitude + ", " + latLng.longitude, Toast.LENGTH_SHORT).show();
     }
 
     public void saveFragmentState(Bundle args) {

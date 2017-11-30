@@ -1,8 +1,8 @@
 <component name="libraryTable">
   <library name="com.google.android.gms:play-services-games-license-11.4.2">
     <CLASSES>
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/play-services-games-license-11.4.2.aar/65974b60f8d9d183f33f458d91a61a4d/res" />
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/play-services-games-license-11.4.2.aar/65974b60f8d9d183f33f458d91a61a4d/jars/classes.jar!/" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/play-services-games-license-11.4.2.aar/da5435b46deba76d100c2e857889d080/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/play-services-games-license-11.4.2.aar/da5435b46deba76d100c2e857889d080/res" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

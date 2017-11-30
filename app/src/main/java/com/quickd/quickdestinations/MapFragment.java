@@ -74,6 +74,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
     LatLng origin;
     LatLng dest;
     TextView ShowDistanceDuration;
+    ArrayList<Polyline> lines = new ArrayList<>();
+    ArrayList<Integer> colors = new ArrayList<>();
     Polyline line;
 
     public MapFragment() {
@@ -90,6 +92,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        colors.add(Color.RED);
+        colors.add(Color.BLUE);
+        colors.add(Color.GREEN);
+        colors.add(Color.MAGENTA);
+        colors.add(Color.YELLOW);
+        colors.add(Color.CYAN);
 
         markersSet = false;
         currentLatLngSet = false;
@@ -115,16 +124,20 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         view.findViewById(R.id.btnPreview).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                origin = ((LoginActivity) getActivity()).getLatLngs().get(0);
-                dest = ((LoginActivity) getActivity()).getLatLngs().get(1);
 
-               // progressDialog = new ProgressDialog(getActivity());
-               // progressDialog.setMessage("Loading");
-               // progressDialog.show();
-
-                build_retrofit_and_get_response("driving");
-
-               // progressDialog.dismiss();
+                int size = ((LoginActivity) getActivity()).getLatLngs().size();
+                if (size > 1)
+                {
+                    int c = 0;
+                    for (int i = 0; i < (size-1); i++)
+                    {
+                        origin = ((LoginActivity) getActivity()).getLatLngs().get(i);
+                        dest = ((LoginActivity) getActivity()).getLatLngs().get(i+1);
+                        build_retrofit_and_get_response("driving", colors.get(c));
+                        if (i < colors.size() - 1) { c++; }
+                        else { c = 0; }
+                    }
+                }
             }
         });
     }
@@ -224,7 +237,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         markerOptions.title("Current Position");
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
         if (!currentLatLngSet) {
-            ((LoginActivity) getActivity()).setLatLngs(latLng);
+            ((LoginActivity) getActivity()).setCurrentLocation(latLng);
             currentLatLngSet = true;
         }
         mCurrLocationMarker = mMap.addMarker(markerOptions);
@@ -308,7 +321,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         }
     }
 
-    private void build_retrofit_and_get_response(String type) {
+    private void build_retrofit_and_get_response(String type, final int c) {
 
         String url = "https://maps.googleapis.com/maps/";
 
@@ -338,11 +351,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                         List<LatLng> list = decodePoly(encodedString);
                         line = mMap.addPolyline(new PolylineOptions()
                                 .addAll(list)
-                                .width(20)
-                                .color(Color.RED)
+                                .width(5)
+                                //.color(Color.RED)
+                                .color(c)
                                 .geodesic(true)
                         );
                     }
+                    line = null;
                 } catch (Exception e) {
                     Log.d("onResponse", "There is an error");
                     e.printStackTrace();
