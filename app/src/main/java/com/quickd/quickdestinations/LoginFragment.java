@@ -52,7 +52,7 @@ public class LoginFragment extends Fragment {
         view.findViewById(R.id.btnLogin).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!TextUtils.isEmpty(username.getText())) {
+                if (!TextUtils.isEmpty(username.getText()) && !TextUtils.isEmpty(password.getText())) {
                     (mAuth.signInWithEmailAndPassword(username.getText().toString(), password.getText().toString()))
                             .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                                 @Override

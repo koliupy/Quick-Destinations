@@ -32,7 +32,7 @@ public class LogoutActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_logout);
 
-        Fragment fragment = new SearchFragment();
+        Fragment fragment = new NavigationFragment();
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.screen_area, fragment);
