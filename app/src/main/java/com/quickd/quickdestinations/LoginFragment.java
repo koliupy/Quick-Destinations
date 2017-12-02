@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,18 +52,25 @@ public class LoginFragment extends Fragment {
         view.findViewById(R.id.btnLogin).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                (mAuth.signInWithEmailAndPassword(username.getText().toString(), password.getText().toString()))
-                        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                if(task.isSuccessful()){
-                                    Toast.makeText(getActivity(), "Successful", Toast.LENGTH_LONG).show();
-                                }else{
-                                    Toast.makeText(getActivity(), task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                if (!TextUtils.isEmpty(username.getText())) {
+                    (mAuth.signInWithEmailAndPassword(username.getText().toString(), password.getText().toString()))
+                            .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    if(task.isSuccessful()){
+                                        Intent intent = new Intent(getActivity(), LogoutActivity.class);
+                                        getActivity().finish();
+                                        startActivity(intent);
+                                        Toast.makeText(getActivity(), "Successful", Toast.LENGTH_LONG).show();
+                                    }else{
+                                        Toast.makeText(getActivity(), task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                    }
                                 }
-                            }
-                        });
-
+                            });
+                }
+                else {
+                    Toast.makeText(getActivity(), "Please enter a username and password", Toast.LENGTH_LONG).show();
+                }
             }
         });
 
@@ -83,15 +91,6 @@ public class LoginFragment extends Fragment {
 
                     }
                 });
-            }
-        });
-
-        view.findViewById(R.id.btnLogin).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getActivity(), LogoutActivity.class);
-                getActivity().finish();
-                startActivity(intent);
             }
         });
 
