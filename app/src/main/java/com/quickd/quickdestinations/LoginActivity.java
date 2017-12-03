@@ -24,6 +24,7 @@ public class LoginActivity extends AppCompatActivity
     public ArrayList<Pair<String, String>> destinations = new ArrayList<>();
     public ArrayList<LatLng> latLngs = new ArrayList<>();
     public static boolean homeState = false;
+    public static boolean loggedIn = false;
     public Bundle fragmentArgs;
 
     @Override

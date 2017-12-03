@@ -77,6 +77,7 @@ public class SearchFragment extends Fragment {
                     if (LogoutActivity.loggedIn == true)
                     {
                         ((LogoutActivity) getActivity()).setDestinations(new Pair(location, time));
+
                     }
                     else
                     {
