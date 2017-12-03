@@ -126,13 +126,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
             public void onClick(View view) {
 
                 int size = ((MainActivity) getActivity()).getLatLngs().size();
-                if (size > 1)
-                {
+                if (size > 1) {
                     int c = 0;
-                    for (int i = 0; i < (size-1); i++)
-                    {
-                        origin = ((MainActivity) getActivity()).getLatLngs().get(i);
-                        dest = ((MainActivity) getActivity()).getLatLngs().get(i+1);
+                    origin = ((MainActivity) getActivity()).getLatLngs().get(0);
+
+                    for (int i = 1; i < size; i++) {
+                        dest = ((MainActivity) getActivity()).getLatLngs().get(i);
                         build_retrofit_and_get_response("driving", colors.get(c));
                         if (i < colors.size() - 1) { c++; }
                         else { c = 0; }
