@@ -73,7 +73,16 @@ public class SearchFragment extends Fragment {
                 String location = searchBar.getText().toString();
                 String time = arrivalTime.getText().toString();
                 if (!location.isEmpty() && (location.trim().length() > 0))
-                    ((LoginActivity) getActivity()).setDestinations(new Pair(location, time));
+                {
+                    if (LogoutActivity.loggedIn == true)
+                    {
+                        ((LogoutActivity) getActivity()).setDestinations(new Pair(location, time));
+                    }
+                    else
+                    {
+                        ((LoginActivity) getActivity()).setDestinations(new Pair(location, time));
+                    }
+                }
                 else
                     Toast.makeText(getActivity(), "INVALID LOCATION: Try again", Toast.LENGTH_SHORT).show();
                 searchBar.setText("");

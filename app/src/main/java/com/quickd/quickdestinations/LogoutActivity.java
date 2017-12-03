@@ -25,6 +25,7 @@ public class LogoutActivity extends AppCompatActivity
     public ArrayList<Pair<String, String>> destinations = new ArrayList<>();
     public ArrayList<LatLng> latLngs = new ArrayList<>();
     public static boolean homeState = false;
+    public static boolean loggedIn = false;
     public Bundle fragmentArgs;
 
     @Override
@@ -39,6 +40,7 @@ public class LogoutActivity extends AppCompatActivity
         fragmentTransaction.commit();
 
         latLngs.add(null);
+        loggedIn = true;
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -94,6 +96,7 @@ public class LogoutActivity extends AppCompatActivity
 
         if (id == R.id.nav_logout) {
             // Handle the camera action
+            loggedIn = false;
             Intent intent = new Intent(LogoutActivity.this, LoginActivity.class);
             finish();
             startActivity(intent);
@@ -123,5 +126,33 @@ public class LogoutActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.logout_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public ArrayList<Pair<String, String>> getDestinations() {
+        return destinations;
+    }
+
+    public void setDestinations(Pair<String, String> destination) {
+        destinations.add(destination);
+    }
+
+    public ArrayList<LatLng> getLatLngs() {
+        return latLngs;
+    }
+
+    public void setCurrentLocation(LatLng latLng) {
+        latLngs.set(0, latLng);
+    }
+
+    public void setLatLngs(LatLng latLng) {
+        latLngs.add(latLng);
+    }
+
+    public void saveFragmentState(Bundle args) {
+        fragmentArgs = args;
+    }
+
+    public Bundle getFragmentState() {
+        return fragmentArgs;
     }
 }
