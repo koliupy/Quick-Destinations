@@ -125,14 +125,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
             @Override
             public void onClick(View view) {
 
-                int size = ((LoginActivity) getActivity()).getLatLngs().size();
+                int size = ((MainActivity) getActivity()).getLatLngs().size();
                 if (size > 1)
                 {
                     int c = 0;
                     for (int i = 0; i < (size-1); i++)
                     {
-                        origin = ((LoginActivity) getActivity()).getLatLngs().get(i);
-                        dest = ((LoginActivity) getActivity()).getLatLngs().get(i+1);
+                        origin = ((MainActivity) getActivity()).getLatLngs().get(i);
+                        dest = ((MainActivity) getActivity()).getLatLngs().get(i+1);
                         build_retrofit_and_get_response("driving", colors.get(c));
                         if (i < colors.size() - 1) { c++; }
                         else { c = 0; }
@@ -169,7 +169,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         }
         if (!markersSet) {
             ArrayList<String> destinations = new ArrayList<>();
-            for (Pair<String, String> temp : ((LoginActivity) getActivity()).getDestinations())
+            for (Pair<String, String> temp : ((MainActivity) getActivity()).getDestinations())
                 destinations.add(temp.first);
 
             for (String location : destinations) {
@@ -185,7 +185,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                     }
                     Address address = addressList.get(0);
                     LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                    ((LoginActivity) getActivity()).setLatLngs(latLng);
+                    ((MainActivity) getActivity()).setLatLngs(latLng);
                     mMap.addMarker(new MarkerOptions().position(latLng).title(address.getFeatureName()));
                     //mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
                 }
@@ -237,7 +237,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         markerOptions.title("Current Position");
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
         if (!currentLatLngSet) {
-            ((LoginActivity) getActivity()).setCurrentLocation(latLng);
+            ((MainActivity) getActivity()).setCurrentLocation(latLng);
             currentLatLngSet = true;
         }
         mCurrLocationMarker = mMap.addMarker(markerOptions);

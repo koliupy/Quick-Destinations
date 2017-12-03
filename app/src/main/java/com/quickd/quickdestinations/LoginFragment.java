@@ -58,7 +58,8 @@ public class LoginFragment extends Fragment {
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     if(task.isSuccessful()){
-                                        Intent intent = new Intent(getActivity(), LogoutActivity.class);
+                                        Intent intent = new Intent(getActivity(), MainActivity.class);
+                                        intent.putExtra("loggedIn", true);
                                         getActivity().finish();
                                         startActivity(intent);
                                         Toast.makeText(getActivity(), "Successful", Toast.LENGTH_LONG).show();
@@ -101,9 +102,9 @@ public class LoginFragment extends Fragment {
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 fragmentTransaction.replace(R.id.screen_area, fragment);
-                if (!LoginActivity.homeState) {
+                if (!MainActivity.homeState) {
                     fragmentTransaction.addToBackStack("home");
-                    LoginActivity.homeState = true;
+                    MainActivity.homeState = true;
                 }
                 fragmentTransaction.commit();
             }

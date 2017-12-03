@@ -34,16 +34,8 @@ public class ViewListFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ArrayList<String> destinations = new ArrayList<>();
-        if (LogoutActivity.loggedIn == true)
-        {
-            for (Pair<String, String> temp : ((LogoutActivity) getActivity()).getDestinations())
-                destinations.add(temp.first + " " + temp.second);
-        }
-        else
-        {
-            for (Pair<String, String> temp : ((LoginActivity) getActivity()).getDestinations())
-                destinations.add(temp.first + " " + temp.second);
-        }
+        for (Pair<String, String> temp : ((MainActivity) getActivity()).getDestinations())
+            destinations.add(temp.first + " " + temp.second);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, destinations);
         ListView listView = (ListView) view.findViewById(R.id.lvList);
         listView.setAdapter(adapter);
