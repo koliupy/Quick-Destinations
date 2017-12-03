@@ -6,19 +6,18 @@ import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Pair;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.TimePicker;
 import android.widget.Toast;
-
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
-import com.google.android.gms.location.places.ui.PlaceSelectionListener;
-import com.google.android.gms.maps.model.LatLng;
 
 import java.util.Calendar;
 
@@ -26,11 +25,13 @@ import java.util.Calendar;
  * A simple {@link Fragment} subclass.
  */
 public class SearchFragment extends Fragment {
+
+    private static final String[] COUNTRIES = new String[]{
+            "Belgium", "France", "Italy", "Germany", "Spain"
+    };
     private static final int TIME_ID = 0;
 
     private EditText arrivalTime;
-    String location;
-    LatLng latLng;
 
     public SearchFragment() {
         // Required empty public constructor
@@ -47,24 +48,16 @@ public class SearchFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-
         arrivalTime = (EditText) view.findViewById(R.id.etArrivalTime);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
+                android.R.layout.simple_dropdown_item_1line, COUNTRIES);
+        ;
 
-        final PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
-                getActivity().getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
-        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
-            @Override
-            public void onPlaceSelected(Place place) {
-                location = place.getAddress().toString();
-                latLng = place.getLatLng();
-                Toast.makeText(getActivity(), location, Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onError(Status status) {
-
-            }
-        });
+        Fragment fragment = new AutoCompleteFragment();
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.tvSearchBar, fragment);
+        fragmentTransaction.commit();
 
         arrivalTime.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,20 +66,26 @@ public class SearchFragment extends Fragment {
             }
         });
 
+        view.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                return false;
+            }
+        });
+
         view.findViewById(R.id.btnAdd).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String time = arrivalTime.getText().toString();
+
+                /*String time = arrivalTime.getText().toString();
                 if (!location.isEmpty() && (location.trim().length() > 0))
                 {
                     ((MainActivity) getActivity()).setDestinations(new Pair(location, time));
                 }
                 else
                     Toast.makeText(getActivity(), "INVALID LOCATION: Try again", Toast.LENGTH_SHORT).show();
-                autocompleteFragment.setText("");
+                searchBar.setText("");
                 arrivalTime.setText("");
-                /*
-                String location = searchBar.getText().toString();
                 */
             }
         });

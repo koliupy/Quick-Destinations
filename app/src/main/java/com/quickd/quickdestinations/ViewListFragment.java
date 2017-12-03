@@ -8,6 +8,7 @@ import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -39,6 +40,13 @@ public class ViewListFragment extends Fragment {
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, destinations);
         ListView listView = (ListView) view.findViewById(R.id.lvList);
         listView.setAdapter(adapter);
+
+        ((ListView) view.findViewById(R.id.lvList)).setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                //Richard do this part of the dialog boxes for hte two button and remove
+            }
+        });
     }
 
     @Override
