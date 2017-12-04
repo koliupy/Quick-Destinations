@@ -52,15 +52,14 @@ public class ViewListFragment extends Fragment {
             public void onItemClick(final AdapterView<?> adapterView, View view, final int i, long l) {
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
                 final String getSelectedItemOfList = destinations.get(i);
-                //Toast.makeText(getActivity(), getSelectedItemOfList,Toast.LENGTH_LONG).show();
-                alertDialogBuilder.setMessage("What do you wish to do with this selected item?");
+                alertDialogBuilder.setMessage("Remove or Save\n" + destinations.get(i) + " ?");
                 alertDialogBuilder.setPositiveButton("Save",new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog,int id) {
                         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
                         if (firebaseUser != null){
-                            Toast.makeText(getActivity(), firebaseUser.getEmail().toString(),Toast.LENGTH_LONG).show();
+                            Toast.makeText(getActivity(), firebaseUser.getEmail().toString(),Toast.LENGTH_SHORT).show();
                         } else{
-                            Toast.makeText(getActivity(), "This feature for only registered Users",Toast.LENGTH_LONG).show();
+                            Toast.makeText(getActivity(), "This feature for only registered Users",Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -68,14 +67,11 @@ public class ViewListFragment extends Fragment {
                     public void onClick(DialogInterface dialog,int id) {
                         destinations.remove(getSelectedItemOfList);
                         listView.invalidateViews();
-                        //removing item as well from the other list
+                        //removing item from the main list
                         ((MainActivity) getActivity()).rmDestinations(i);
                     }
                 });
                 alertDialogBuilder.show();
-
-
-
             }
         });
     }

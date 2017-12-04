@@ -58,7 +58,6 @@ public class SearchFragment extends Fragment {
                 name = place.getName().toString();
                 location = place.getAddress().toString();
                 latLng = place.getLatLng();
-                Toast.makeText(getActivity(), location, Toast.LENGTH_LONG).show();
             }
 
             @Override
@@ -78,13 +77,12 @@ public class SearchFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 String time = arrivalTime.getText().toString();
-                if (location.trim().length() > 0)
-                {
+                if (location.trim().length() > 0) {
                     ((MainActivity) getActivity()).setDestinations(new Pair(location, time));
                     ((MainActivity) getActivity()).setLatLngs(new Pair(name, latLng));
-                }
-                else
-                    Toast.makeText(getActivity(), "Please enter a destination.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Successfully added destination", Toast.LENGTH_SHORT).show();
+                } else
+                    Toast.makeText(getActivity(), "Please enter a destination", Toast.LENGTH_SHORT).show();
                 autocompleteFragment.setText("");
                 arrivalTime.setText("");
                 location = "";
@@ -93,7 +91,6 @@ public class SearchFragment extends Fragment {
     }
 
     public Dialog createDialog(int id) {
-
         // Get the calander
         Calendar c = Calendar.getInstance();
 

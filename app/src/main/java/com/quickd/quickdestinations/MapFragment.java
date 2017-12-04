@@ -288,9 +288,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                     }
 
                 } else {
-
                     // Permission denied, Disable the functionality that depends on this permission.
-                    Toast.makeText(getActivity(), "permission denied", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), "Permission denied", Toast.LENGTH_SHORT).show();
                 }
                 return;
             }
