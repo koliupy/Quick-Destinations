@@ -4,6 +4,7 @@ package com.quickd.quickdestinations;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Pair;
@@ -13,14 +14,23 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
+
+import static com.google.firebase.auth.FirebaseAuth.getInstance;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class ViewListFragment extends Fragment {
+
+
+
 
     public ViewListFragment() {
         // Required empty public constructor
@@ -56,7 +66,16 @@ public class ViewListFragment extends Fragment {
                 alertDialogBuilder.setPositiveButton("Save",new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog,int id)
                     {
-                        //saveMe();
+                        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+                        if (firebaseUser != null){
+                            Toast.makeText(getActivity(), firebaseUser.getEmail().toString(),Toast.LENGTH_LONG).show();
+                        } else{
+                            Toast.makeText(getActivity(), "This feature for only registered Users",Toast.LENGTH_LONG).show();
+                        }
+
+
+
+
                     }
                 });
                 alertDialogBuilder.setNegativeButton("Remove",new DialogInterface.OnClickListener() {
