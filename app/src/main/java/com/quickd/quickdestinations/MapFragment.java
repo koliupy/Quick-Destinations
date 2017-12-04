@@ -217,11 +217,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         markerOptions.position(latLng);
         markerOptions.title("Current Position");
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-        if (!currentLatLngSet) {
-            ((MainActivity) getActivity()).setCurrentLocation(new Pair("Me", latLng));
-            currentLatLngSet = true;
-        }
         mCurrLocationMarker = mMap.addMarker(markerOptions);
+        ((MainActivity) getActivity()).setCurrentLocation(new Pair("Me", latLng));
 
         //move map camera
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));

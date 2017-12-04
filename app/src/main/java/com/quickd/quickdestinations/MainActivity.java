@@ -155,12 +155,21 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    public void setDestinations(Pair<String, String> destination) {
+        destinations.add(destination);
+    }
+
     public ArrayList<Pair<String, String>> getDestinations() {
         return destinations;
     }
 
-    public void setDestinations(Pair<String, String> destination) {
-        destinations.add(destination);
+    public void rmDestinations(int i){
+        destinations.remove(i);
+        latLngs.remove(i+1);
+    }
+
+    public void setLatLngs(Pair<String, LatLng> latLng) {
+        latLngs.add(latLng);
     }
 
     public ArrayList<Pair<String, LatLng>> getLatLngs() {
@@ -169,10 +178,6 @@ public class MainActivity extends AppCompatActivity
 
     public void setCurrentLocation(Pair<String, LatLng> latLng) {
         latLngs.set(0, latLng);
-    }
-
-    public void setLatLngs(Pair<String, LatLng> latLng) {
-        latLngs.add(latLng);
     }
 
     public void saveFragmentState(Bundle args) {
