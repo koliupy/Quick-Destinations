@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     public ArrayList<Pair<String, String>> destinations = new ArrayList<>();
-    public ArrayList<LatLng> latLngs = new ArrayList<>();
+    public ArrayList<Pair<String, LatLng>> latLngs = new ArrayList<>();
     public static boolean homeState = false;
     public static boolean loggedIn = false;
     public Bundle fragmentArgs;
@@ -163,15 +163,15 @@ public class MainActivity extends AppCompatActivity
         destinations.add(destination);
     }
 
-    public ArrayList<LatLng> getLatLngs() {
+    public ArrayList<Pair<String, LatLng>> getLatLngs() {
         return latLngs;
     }
 
-    public void setCurrentLocation(LatLng latLng) {
+    public void setCurrentLocation(Pair<String, LatLng> latLng) {
         latLngs.set(0, latLng);
     }
 
-    public void setLatLngs(LatLng latLng) {
+    public void setLatLngs(Pair<String, LatLng> latLng) {
         latLngs.add(latLng);
     }
 

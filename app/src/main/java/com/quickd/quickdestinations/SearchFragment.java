@@ -6,8 +6,6 @@ import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,7 +16,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.location.places.ui.SupportPlaceAutocompleteFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -32,6 +29,7 @@ public class SearchFragment extends Fragment {
     private static final int TIME_ID = 0;
 
     private EditText arrivalTime;
+    String name;
     String location;
     LatLng latLng;
 
@@ -57,6 +55,7 @@ public class SearchFragment extends Fragment {
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(Place place) {
+                name = place.getName().toString();
                 location = place.getAddress().toString();
                 latLng = place.getLatLng();
                 Toast.makeText(getActivity(), location, Toast.LENGTH_LONG).show();
@@ -82,6 +81,7 @@ public class SearchFragment extends Fragment {
                 if (!location.isEmpty() && (location.trim().length() > 0))
                 {
                     ((MainActivity) getActivity()).setDestinations(new Pair(location, time));
+                    ((MainActivity) getActivity()).setLatLngs(new Pair(name, latLng));
                 }
                 else
                     Toast.makeText(getActivity(), "INVALID LOCATION: Try again", Toast.LENGTH_SHORT).show();

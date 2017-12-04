@@ -2,7 +2,6 @@ package com.quickd.quickdestinations;
 
 
 import android.Manifest;
-import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Address;
@@ -28,6 +27,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.Place;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -61,7 +61,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
 
-    private ProgressDialog progressDialog;
     private GoogleMap mMap;
     private boolean markersSet;
     private boolean currentLatLngSet;
@@ -74,7 +73,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
     LatLng origin;
     LatLng dest;
     TextView ShowDistanceDuration;
-    ArrayList<Polyline> lines = new ArrayList<>();
     ArrayList<Integer> colors = new ArrayList<>();
     Polyline line;
 
@@ -117,7 +115,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         }
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) this.getChildFragmentManager()
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.map_area);
         mapFragment.getMapAsync(this);
 
@@ -128,10 +126,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                 int size = ((MainActivity) getActivity()).getLatLngs().size();
                 if (size > 1) {
                     int c = 0;
-                    origin = ((MainActivity) getActivity()).getLatLngs().get(0);
+                    origin = ((MainActivity) getActivity()).getLatLngs().get(0).second;
 
                     for (int i = 1; i < size; i++) {
-                        dest = ((MainActivity) getActivity()).getLatLngs().get(i);
+                        dest = ((MainActivity) getActivity()).getLatLngs().get(i).second;
                         build_retrofit_and_get_response("driving", colors.get(c));
                         if (i < colors.size() - 1) { c++; }
                         else { c = 0; }
@@ -167,27 +165,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
             mMap.setMyLocationEnabled(true);
         }
         if (!markersSet) {
-            ArrayList<String> destinations = new ArrayList<>();
-            for (Pair<String, String> temp : ((MainActivity) getActivity()).getDestinations())
-                destinations.add(temp.first);
-
-            for (String location : destinations) {
-                List<Address> addressList = null;
-
-                if (location != null || !location.equals("")) {
-                    Geocoder geocoder = new Geocoder(getActivity());
-                    try {
-                        addressList = geocoder.getFromLocationName(location, 1);
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    Address address = addressList.get(0);
-                    LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                    ((MainActivity) getActivity()).setLatLngs(latLng);
-                    mMap.addMarker(new MarkerOptions().position(latLng).title(address.getFeatureName()));
-                    //mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
-                }
+            int i = 0;
+            for (Pair<String, LatLng> temp : ((MainActivity) getActivity()).getLatLngs()) {
+                if (i != 0)
+                    mMap.addMarker(new MarkerOptions().position(temp.second).title(temp.first));
+                i++;
             }
             markersSet = true;
         }
@@ -236,7 +218,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         markerOptions.title("Current Position");
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
         if (!currentLatLngSet) {
-            ((MainActivity) getActivity()).setCurrentLocation(latLng);
+            ((MainActivity) getActivity()).setCurrentLocation(new Pair("Me", latLng));
             currentLatLngSet = true;
         }
         mCurrLocationMarker = mMap.addMarker(markerOptions);
