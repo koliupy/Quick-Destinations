@@ -1,6 +1,8 @@
 package com.quickd.quickdestinations;
 
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -8,6 +10,7 @@ import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -33,14 +36,44 @@ public class ViewListFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ArrayList<String> destinations = new ArrayList<>();
+        final ArrayList<String> destinations = new ArrayList<>();
         for (Pair<String, String> temp : ((MainActivity) getActivity()).getDestinations())
-            destinations.add(temp.first + " " + temp.second);
+            destinations.add(temp.first);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, destinations);
-        ListView listView = (ListView) view.findViewById(R.id.lvList);
+        final ListView listView = (ListView) view.findViewById(R.id.lvList);
         listView.setAdapter(adapter);
-    }
 
+
+
+        ((ListView) view.findViewById(R.id.lvList)).setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(final AdapterView<?> adapterView, View view, final int i, long l) {
+
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+                final String getSelectedItemOfList = destinations.get(i);
+                //Toast.makeText(getActivity(), getSelectedItemOfList,Toast.LENGTH_LONG).show();
+                alertDialogBuilder.setMessage("What do you wish to do with this selected item?");
+                alertDialogBuilder.setPositiveButton("Save",new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,int id)
+                    {
+                        //saveMe();
+                    }
+                });
+                alertDialogBuilder.setNegativeButton("Remove",new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,int id) {
+                        destinations.remove(getSelectedItemOfList);
+                        listView.invalidateViews();
+                        //removing item as well from the other list
+                        ((MainActivity) getActivity()).rmDestinations(i);
+                    }
+                });
+                alertDialogBuilder.show();
+
+
+
+            }
+        });
+    }
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);

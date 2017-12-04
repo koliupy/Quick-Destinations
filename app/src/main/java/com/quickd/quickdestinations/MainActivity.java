@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity
             finish();
             startActivity(intent);
         } else if (id == R.id.nav_start) {
-                fragment = new NavigationFragment();
+            fragment = new NavigationFragment();
         } else if (id == R.id.nav_description) {
 
         } else if (id == R.id.nav_license) {
@@ -153,6 +153,13 @@ public class MainActivity extends AppCompatActivity
             drawer = (DrawerLayout) findViewById(R.id.login_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public void rmDestinations(int position){
+
+        destinations.remove(position);
+        latLngs.remove(position+1);
+
     }
 
     public ArrayList<Pair<String, String>> getDestinations() {
