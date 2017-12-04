@@ -63,7 +63,7 @@ public class LoginFragment extends Fragment {
                                         getActivity().finish();
                                         startActivity(intent);
                                         Toast.makeText(getActivity(), "Successful authentication", Toast.LENGTH_SHORT).show();
-                                    }else {
+                                    } else {
                                         Toast.makeText(getActivity(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                                     }
                                 }

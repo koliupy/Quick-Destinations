@@ -43,7 +43,7 @@ public class ViewListFragment extends Fragment {
         final ArrayList<String> destinations = new ArrayList<>();
         for (Pair<String, String> temp : ((MainActivity) getActivity()).getDestinations())
             destinations.add(temp.first);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, destinations);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, destinations);
         final ListView listView = view.findViewById(R.id.lvList);
         listView.setAdapter(adapter);
 
@@ -57,7 +57,7 @@ public class ViewListFragment extends Fragment {
                     public void onClick(DialogInterface dialog,int id) {
                         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
                         if (firebaseUser != null){
-                            Toast.makeText(getActivity(), firebaseUser.getEmail().toString(),Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity(), firebaseUser.getEmail(),Toast.LENGTH_SHORT).show();
                         } else{
                             Toast.makeText(getActivity(), "This feature for only registered Users",Toast.LENGTH_SHORT).show();
                         }
