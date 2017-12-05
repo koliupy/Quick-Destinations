@@ -59,6 +59,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
 
     private GoogleMap mMap;
     private boolean markersSet;
+    private int minTime;
 
     GoogleApiClient mGoogleApiClient;
     Marker mCurrLocationMarker;
@@ -69,6 +70,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
     TextView ShowDistanceDuration;
     ArrayList<Integer> colors = new ArrayList<>();
     Polyline line;
+
 
     public MapFragment() {
         // Required empty public constructor
@@ -92,6 +94,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         colors.add(Color.YELLOW);
         colors.add(Color.CYAN);
 
+        minTime = Integer.MAX_VALUE;
         markersSet = false;
         ShowDistanceDuration = view.findViewById(R.id.tvDistanceTime);
 
@@ -306,25 +309,27 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
             public void onResponse(Call<Example> call, Response<Example> response) {
                 try {
                     //Remove previous line from map
-                    if (line != null) {
-                        line.remove();
-                    }
                     // This loop will go through all the results and add marker on each location.
                     for (int i = 0; i < response.body().getRoutes().size(); i++) {
                         String distance = response.body().getRoutes().get(i).getLegs().get(i).getDistance().getText();
                         String time = response.body().getRoutes().get(i).getLegs().get(i).getDuration().getText();
-                        ShowDistanceDuration.setText("Distance:" + distance + ", Duration:" + time);
-                        String encodedString = response.body().getRoutes().get(0).getOverviewPolyline().getPoints();
-                        List<LatLng> list = decodePoly(encodedString);
-                        line = mMap.addPolyline(new PolylineOptions()
-                                .addAll(list)
-                                .width(5)
-                                //.color(Color.RED)
-                                .color(c)
-                                .geodesic(true)
-                        );
+                        int timeTemp = Integer.parseInt(time.substring(0, time.indexOf(" ")));
+                        if(timeTemp <= minTime) {
+                            minTime = timeTemp;
+                            if(line != null)
+                                line.remove();
+                            ShowDistanceDuration.setText("Distance:" + distance + ", Duration:" + time);
+                            String encodedString = response.body().getRoutes().get(0).getOverviewPolyline().getPoints();
+                            List<LatLng> list = decodePoly(encodedString);
+                            line = mMap.addPolyline(new PolylineOptions()
+                                    .addAll(list)
+                                    .width(5)
+                                    //.color(Color.RED)
+                                    .color(c)
+                                    .geodesic(true)
+                            );
+                        }
                     }
-                    line = null;
                 } catch (Exception e) {
                     Log.d("onResponse", "There is an error");
                     e.printStackTrace();
