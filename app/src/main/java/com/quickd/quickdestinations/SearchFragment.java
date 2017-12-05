@@ -30,7 +30,7 @@ public class SearchFragment extends Fragment {
 
     private EditText arrivalTime;
     String name;
-    String location = "";
+    String location;
     LatLng latLng;
 
     public SearchFragment() {
@@ -48,7 +48,7 @@ public class SearchFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        arrivalTime = view.findViewById(R.id.etArrivalTime);
+        arrivalTime = (EditText) view.findViewById(R.id.etArrivalTime);
 
         final SupportPlaceAutocompleteFragment autocompleteFragment = (SupportPlaceAutocompleteFragment)
                 getChildFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
@@ -58,6 +58,7 @@ public class SearchFragment extends Fragment {
                 name = place.getName().toString();
                 location = place.getAddress().toString();
                 latLng = place.getLatLng();
+                Toast.makeText(getActivity(), location, Toast.LENGTH_LONG).show();
             }
 
             @Override
@@ -77,20 +78,21 @@ public class SearchFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 String time = arrivalTime.getText().toString();
-                if (location.trim().length() > 0) {
+                if (!location.isEmpty() && (location.trim().length() > 0))
+                {
                     ((MainActivity) getActivity()).setDestinations(new Pair(location, time));
                     ((MainActivity) getActivity()).setLatLngs(new Pair(name, latLng));
-                    Toast.makeText(getActivity(), "Successfully added destination", Toast.LENGTH_SHORT).show();
-                } else
-                    Toast.makeText(getActivity(), "Please enter a destination", Toast.LENGTH_SHORT).show();
+                }
+                else
+                    Toast.makeText(getActivity(), "INVALID LOCATION: Try again", Toast.LENGTH_SHORT).show();
                 autocompleteFragment.setText("");
                 arrivalTime.setText("");
-                location = "";
             }
         });
     }
 
     public Dialog createDialog(int id) {
+
         // Get the calander
         Calendar c = Calendar.getInstance();
 

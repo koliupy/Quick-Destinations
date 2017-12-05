@@ -68,7 +68,7 @@ public class NavigationFragment extends Fragment {
             }
         };
 
-        BottomNavigationView navigation = view.findViewById(R.id.navigation);
+        BottomNavigationView navigation = (BottomNavigationView) view.findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
     }
 

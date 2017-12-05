@@ -4,6 +4,8 @@ package com.quickd.quickdestinations;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -25,6 +27,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.Place;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -37,6 +40,7 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.quickd.quickdestinations.POJO.Example;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,8 +63,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
 
     private GoogleMap mMap;
     private boolean markersSet;
+    private boolean currentLatLngSet;
 
     GoogleApiClient mGoogleApiClient;
+    Location mLastLocation;
     Marker mCurrLocationMarker;
     LocationRequest mLocationRequest;
 
@@ -93,7 +99,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         colors.add(Color.CYAN);
 
         markersSet = false;
-        ShowDistanceDuration = view.findViewById(R.id.tvDistanceTime);
+        currentLatLngSet = false;
+        ShowDistanceDuration = (TextView) view.findViewById(R.id.tvDistanceTime);
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkLocationPermission();
@@ -198,6 +205,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void onLocationChanged(Location location) {
+
+        mLastLocation = location;
         if (mCurrLocationMarker != null) {
             mCurrLocationMarker.remove();
         }
@@ -208,8 +217,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         markerOptions.position(latLng);
         markerOptions.title("Current Position");
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
+        if (!currentLatLngSet) {
+            ((MainActivity) getActivity()).setCurrentLocation(new Pair("Me", latLng));
+            currentLatLngSet = true;
+        }
         mCurrLocationMarker = mMap.addMarker(markerOptions);
-        ((MainActivity) getActivity()).setCurrentLocation(new Pair("Me", latLng));
 
         //move map camera
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
@@ -279,9 +291,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                     }
 
                 } else {
+
                     // Permission denied, Disable the functionality that depends on this permission.
-                    Toast.makeText(getActivity(), "Permission denied", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "permission denied", Toast.LENGTH_LONG).show();
                 }
+                return;
             }
             // other 'case' lines to check for other permissions this app might request.
             // You can add here other case statements according to your requirement.
@@ -340,7 +354,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
     }
 
     private List<LatLng> decodePoly(String encoded) {
-        List<LatLng> poly = new ArrayList<>();
+        List<LatLng> poly = new ArrayList<LatLng>();
         int index = 0, len = encoded.length();
         int lat = 0, lng = 0;
 

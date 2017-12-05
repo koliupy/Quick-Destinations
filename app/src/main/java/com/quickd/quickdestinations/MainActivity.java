@@ -53,20 +53,20 @@ public class MainActivity extends AppCompatActivity
 
         latLngs.add(null);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         DrawerLayout drawer;
         if (loggedIn == true)
-            drawer = findViewById(R.id.logout_layout);
+            drawer = (DrawerLayout) findViewById(R.id.logout_layout);
         else
-            drawer = findViewById(R.id.login_layout);
+            drawer = (DrawerLayout) findViewById(R.id.login_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = findViewById(R.id.nav_view);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
     }
 
@@ -74,9 +74,9 @@ public class MainActivity extends AppCompatActivity
     public void onBackPressed() {
         DrawerLayout drawer;
         if (loggedIn == true)
-            drawer = findViewById(R.id.logout_layout);
+            drawer = (DrawerLayout) findViewById(R.id.logout_layout);
         else
-            drawer = findViewById(R.id.login_layout);
+            drawer = (DrawerLayout) findViewById(R.id.login_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity
             finish();
             startActivity(intent);
         } else if (id == R.id.nav_start) {
-                fragment = new NavigationFragment();
+            fragment = new NavigationFragment();
         } else if (id == R.id.nav_description) {
 
         } else if (id == R.id.nav_license) {
@@ -148,28 +148,26 @@ public class MainActivity extends AppCompatActivity
 
         DrawerLayout drawer;
         if (loggedIn == true)
-            drawer = findViewById(R.id.logout_layout);
+            drawer = (DrawerLayout) findViewById(R.id.logout_layout);
         else
-            drawer = findViewById(R.id.login_layout);
+            drawer = (DrawerLayout) findViewById(R.id.login_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
-    public void setDestinations(Pair<String, String> destination) {
-        destinations.add(destination);
+    public void rmDestinations(int position){
+
+        destinations.remove(position);
+        latLngs.remove(position+1);
+
     }
 
     public ArrayList<Pair<String, String>> getDestinations() {
         return destinations;
     }
 
-    public void rmDestinations(int i){
-        destinations.remove(i);
-        latLngs.remove(i+1);
-    }
-
-    public void setLatLngs(Pair<String, LatLng> latLng) {
-        latLngs.add(latLng);
+    public void setDestinations(Pair<String, String> destination) {
+        destinations.add(destination);
     }
 
     public ArrayList<Pair<String, LatLng>> getLatLngs() {
@@ -178,6 +176,10 @@ public class MainActivity extends AppCompatActivity
 
     public void setCurrentLocation(Pair<String, LatLng> latLng) {
         latLngs.set(0, latLng);
+    }
+
+    public void setLatLngs(Pair<String, LatLng> latLng) {
+        latLngs.add(latLng);
     }
 
     public void saveFragmentState(Bundle args) {
