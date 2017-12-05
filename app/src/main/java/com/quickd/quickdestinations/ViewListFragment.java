@@ -73,7 +73,6 @@ public class ViewListFragment extends Fragment {
 
                         if (firebaseUser != null){
                             myRef= myRef.child("Users").child(firebaseUser.getUid().toString()).child("Saved Location");
-
                             myRef.push().setValue(getSelectedItemOfList);
                             //myRef.child("Users").child(firebaseUser.getUid().toString()).child("Saved Location").push().setValue(getSelectedItemOfList);
 
