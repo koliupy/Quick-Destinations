@@ -63,7 +63,6 @@ public class ViewListFragment extends Fragment {
 
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
                 final String getSelectedItemOfList = destinations.get(i);
-                //Toast.makeText(getActivity(), getSelectedItemOfList,Toast.LENGTH_LONG).show();
                 alertDialogBuilder.setMessage("What do you wish to do with this selected item?");
                 alertDialogBuilder.setPositiveButton("Save",new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog,int id)
@@ -73,14 +72,14 @@ public class ViewListFragment extends Fragment {
                         DatabaseReference myRef = database.getReference();
 
                         if (firebaseUser != null){
-                            myRef.child("Users").child(firebaseUser.getUid().toString()).child("Saved Location").setValue(getSelectedItemOfList);
+                            myRef= myRef.child("Users").child(firebaseUser.getUid().toString()).child("Saved Location");
+
+                            myRef.push().setValue(getSelectedItemOfList);
+                            //myRef.child("Users").child(firebaseUser.getUid().toString()).child("Saved Location").push().setValue(getSelectedItemOfList);
 
                         } else{
                             Toast.makeText(getActivity(), "This feature for only registered Users",Toast.LENGTH_LONG).show();
                         }
-
-
-
 
                     }
                 });
