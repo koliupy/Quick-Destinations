@@ -18,6 +18,8 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
@@ -67,8 +69,12 @@ public class ViewListFragment extends Fragment {
                     public void onClick(DialogInterface dialog,int id)
                     {
                         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+                        FirebaseDatabase database = FirebaseDatabase.getInstance();
+                        DatabaseReference myRef = database.getReference();
+
                         if (firebaseUser != null){
-                            Toast.makeText(getActivity(), firebaseUser.getEmail().toString(),Toast.LENGTH_LONG).show();
+                            myRef.child("Users").child(firebaseUser.getUid().toString()).child("Saved Location").setValue(getSelectedItemOfList);
+
                         } else{
                             Toast.makeText(getActivity(), "This feature for only registered Users",Toast.LENGTH_LONG).show();
                         }
