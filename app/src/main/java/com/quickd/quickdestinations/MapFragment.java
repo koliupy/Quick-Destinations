@@ -126,7 +126,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
 
                     for (int i = 1; i < size; i++) {
                         dest = ((MainActivity) getActivity()).getLatLngs().get(i).second;
-                        build_retrofit_and_get_response("driving", colors.get(c));
+                        buildPolyline("driving", colors.get(c));
                         if (i < colors.size() - 1) { c++; }
                         else { c = 0; }
                     }
@@ -291,7 +291,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         }
     }
 
-    private void build_retrofit_and_get_response(String type, final int c) {
+    private void buildPolyline(String type, final int c) {
 
         String url = "https://maps.googleapis.com/maps/";
 
@@ -320,7 +320,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                                 line.remove();
                             ShowDistanceDuration.setText("Distance:" + distance + ", Duration:" + time);
                             String encodedString = response.body().getRoutes().get(0).getOverviewPolyline().getPoints();
-                            List<LatLng> list = decodePoly(encodedString);
+                            List<LatLng> list = parsePolyline(encodedString);
                             line = mMap.addPolyline(new PolylineOptions()
                                     .addAll(list)
                                     .width(5)
@@ -344,7 +344,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
 
     }
 
-    private List<LatLng> decodePoly(String encoded) {
+    private List<LatLng> parsePolyline(String encoded) {
         List<LatLng> poly = new ArrayList<>();
         int index = 0, len = encoded.length();
         int lat = 0, lng = 0;

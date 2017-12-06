@@ -58,8 +58,11 @@ public class ViewListFragment extends Fragment {
                 alertDialogBuilder.setPositiveButton("Save",new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog,int id) {
                         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+                        FirebaseDatabase database = FirebaseDatabase.getInstance();
+                        DatabaseReference myRef = database.getReference();
                         if (firebaseUser != null){
-                            (FirebaseDatabase.getInstance().getReference().child("Users").child(firebaseUser.getUid().toString()).child("Saved Location")).push().setValue(getSelectedItemOfList);
+                            myRef= myRef.child("Users").child(firebaseUser.getUid().toString()).child("Saved Location");
+                            myRef.push().setValue(getSelectedItemOfList);
                             Toast.makeText(getActivity(), firebaseUser.getEmail(),Toast.LENGTH_SHORT).show();
                         } else{
                             Toast.makeText(getActivity(), "This feature for only registered Users",Toast.LENGTH_SHORT).show();
