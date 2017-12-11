@@ -16,6 +16,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
@@ -122,7 +126,14 @@ public class MainActivity extends AppCompatActivity
             Intent intent = new Intent(this, MainActivity.class);
             intent.putExtra("loggedIn", false);
             finish();
+            FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+            FirebaseAuth mAuth = FirebaseAuth.getInstance();
+            if(firebaseUser != null){
+                //user is signed in
+                mAuth.signOut();
+            }
             startActivity(intent);
+
         } else if (id == R.id.nav_start) {
             fragment = new NavigationFragment();
         } else if (id == R.id.nav_description) {
@@ -154,6 +165,7 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
 
     public void rmDestinations(int position){
 
