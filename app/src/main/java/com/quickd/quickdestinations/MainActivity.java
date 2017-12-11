@@ -14,8 +14,11 @@ import android.support.v7.widget.Toolbar;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 
@@ -26,6 +29,8 @@ public class MainActivity extends AppCompatActivity
     public ArrayList<Pair<String, LatLng>> latLngs = new ArrayList<>();
     public static boolean homeState = false;
     public static boolean loggedIn = false;
+    public static boolean startup = true;
+    private ImageView splashImageView;
     public Bundle fragmentArgs;
 
     @Override
@@ -122,6 +127,11 @@ public class MainActivity extends AppCompatActivity
             Intent intent = new Intent(this, MainActivity.class);
             intent.putExtra("loggedIn", false);
             finish();
+            FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+            FirebaseAuth mAuth = FirebaseAuth.getInstance();
+            if(firebaseUser != null){
+                mAuth.signOut();
+            }
             startActivity(intent);
         } else if (id == R.id.nav_start) {
                 fragment = new NavigationFragment();
