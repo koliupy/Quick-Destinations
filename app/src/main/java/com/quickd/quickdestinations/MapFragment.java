@@ -4,8 +4,6 @@ package com.quickd.quickdestinations;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+import java.util.Calendar;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -27,7 +26,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.places.Place;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -40,9 +38,9 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.quickd.quickdestinations.POJO.Example;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.PriorityQueue;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -63,10 +61,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
 
     private GoogleMap mMap;
     private boolean markersSet;
-    private boolean currentLatLngSet;
+    private int minTime;
 
     GoogleApiClient mGoogleApiClient;
-    Location mLastLocation;
     Marker mCurrLocationMarker;
     LocationRequest mLocationRequest;
 
@@ -76,8 +73,65 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
     ArrayList<Integer> colors = new ArrayList<>();
     Polyline line;
 
+
     public MapFragment() {
         // Required empty public constructor
+    }
+
+
+    boolean test;
+    boolean hasEligible;
+
+    public boolean isEligible(LatLng latLong, final int firstTime, String type){
+        if(((MainActivity) getActivity()).getTimedLatLngs().isEmpty())
+            return true;
+        else{
+            LatLng temp = ((MainActivity) getActivity()).getTimedLatLngs().peek().latLong;
+            if(latLong.equals(temp))
+                return false;
+            final int maxTime = ((MainActivity) getActivity()).getTimedLatLngs().peek().minuteTime;
+            test = false;
+
+            int hour = Calendar.getInstance().get(Calendar.HOUR);
+            int min = Calendar.getInstance().get(Calendar.MINUTE);
+            min += hour*60;
+            final int currTime = min;
+            String url = "https://maps.googleapis.com/maps/";
+
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(url)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+
+            RetrofitMaps service = retrofit.create(RetrofitMaps.class);
+
+            Call<Example> call = service.getDistanceDuration("metric", latLong.latitude + "," + latLong.longitude,
+                    temp.latitude + "," + temp.longitude, type);
+            call.enqueue(new Callback<Example>() {
+                @Override
+                public void onResponse(Call<Example> call, Response<Example> response) {
+                    try {
+                        //Remove previous line from map
+                        // This loop will go through all the results and add marker on each location.
+                            String time = response.body().getRoutes().get(0).getLegs().get(0).getDuration().getText();
+                            int timeTemp = Integer.parseInt(time.substring(0, time.indexOf(" ")));
+                            if(timeTemp + firstTime + currTime <= maxTime-15){
+                                test = true;
+                                hasEligible = true;
+                            }
+                    } catch (Exception e) {
+                        Log.d("onResponse", "There is an error");
+                        e.printStackTrace();
+                    }
+                }
+                @Override
+                public void onFailure(Call<Example> call, Throwable t) {
+                    Log.d("onFailure", t.toString());
+                }
+            });
+            //String time = response.body().getRoutes().get(0).getLegs().get(0).getDuration().getText();
+            return test;
+        }
     }
 
     @Override
@@ -98,9 +152,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         colors.add(Color.YELLOW);
         colors.add(Color.CYAN);
 
+        minTime = Integer.MAX_VALUE;
         markersSet = false;
-        currentLatLngSet = false;
-        ShowDistanceDuration = (TextView) view.findViewById(R.id.tvDistanceTime);
+        ShowDistanceDuration = view.findViewById(R.id.tvDistanceTime);
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkLocationPermission();
@@ -130,10 +184,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
 
                     for (int i = 1; i < size; i++) {
                         dest = ((MainActivity) getActivity()).getLatLngs().get(i).second;
-                        build_retrofit_and_get_response("driving", colors.get(c));
+                        buildPolyline("driving", colors.get(c));
                         if (i < colors.size() - 1) { c++; }
                         else { c = 0; }
                     }
+                    if(!hasEligible){
+                        dest = ((MainActivity) getActivity()).getTimedLatLngs().remove().latLong;
+                        buildPolyline("driving", colors.get(c));
+                    }
+                    else
+                        hasEligible = false;
                 }
             }
         });
@@ -205,8 +265,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void onLocationChanged(Location location) {
-
-        mLastLocation = location;
         if (mCurrLocationMarker != null) {
             mCurrLocationMarker.remove();
         }
@@ -217,11 +275,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         markerOptions.position(latLng);
         markerOptions.title("Current Position");
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-        if (!currentLatLngSet) {
-            ((MainActivity) getActivity()).setCurrentLocation(new Pair("Me", latLng));
-            currentLatLngSet = true;
-        }
         mCurrLocationMarker = mMap.addMarker(markerOptions);
+        ((MainActivity) getActivity()).setCurrentLocation(new Pair("Me", latLng));
 
         //move map camera
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
@@ -291,18 +346,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                     }
 
                 } else {
-
                     // Permission denied, Disable the functionality that depends on this permission.
-                    Toast.makeText(getActivity(), "permission denied", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), "Permission denied", Toast.LENGTH_SHORT).show();
                 }
-                return;
             }
             // other 'case' lines to check for other permissions this app might request.
             // You can add here other case statements according to your requirement.
         }
     }
 
-    private void build_retrofit_and_get_response(String type, final int c) {
+    private void buildPolyline(final String type, final int c) {
 
         String url = "https://maps.googleapis.com/maps/";
 
@@ -320,25 +373,29 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
             public void onResponse(Call<Example> call, Response<Example> response) {
                 try {
                     //Remove previous line from map
-                    if (line != null) {
-                        line.remove();
-                    }
                     // This loop will go through all the results and add marker on each location.
                     for (int i = 0; i < response.body().getRoutes().size(); i++) {
                         String distance = response.body().getRoutes().get(i).getLegs().get(i).getDistance().getText();
                         String time = response.body().getRoutes().get(i).getLegs().get(i).getDuration().getText();
-                        ShowDistanceDuration.setText("Distance:" + distance + ", Duration:" + time);
-                        String encodedString = response.body().getRoutes().get(0).getOverviewPolyline().getPoints();
-                        List<LatLng> list = decodePoly(encodedString);
-                        line = mMap.addPolyline(new PolylineOptions()
-                                .addAll(list)
-                                .width(5)
-                                //.color(Color.RED)
-                                .color(c)
-                                .geodesic(true)
-                        );
+                        int timeTemp = Integer.parseInt(time.substring(0, time.indexOf(" ")));
+                        if(timeTemp <= minTime) {
+                            if(isEligible(dest, timeTemp, type)) {
+                                minTime = timeTemp;
+                                if (line != null)
+                                    line.remove();
+                                ShowDistanceDuration.setText("Distance:" + distance + ", Duration:" + time);
+                                String encodedString = response.body().getRoutes().get(0).getOverviewPolyline().getPoints();
+                                List<LatLng> list = parsePolyline(encodedString);
+                                line = mMap.addPolyline(new PolylineOptions()
+                                        .addAll(list)
+                                        .width(5)
+                                        //.color(Color.RED)
+                                        .color(c)
+                                        .geodesic(true)
+                                );
+                            }
+                        }
                     }
-                    line = null;
                 } catch (Exception e) {
                     Log.d("onResponse", "There is an error");
                     e.printStackTrace();
@@ -353,8 +410,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
 
     }
 
-    private List<LatLng> decodePoly(String encoded) {
-        List<LatLng> poly = new ArrayList<LatLng>();
+    private List<LatLng> parsePolyline(String encoded) {
+        List<LatLng> poly = new ArrayList<>();
         int index = 0, len = encoded.length();
         int lat = 0, lng = 0;
 

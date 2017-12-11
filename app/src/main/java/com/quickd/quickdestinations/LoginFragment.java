@@ -46,8 +46,8 @@ public class LoginFragment extends Fragment {
 
         mAuth = FirebaseAuth.getInstance();
 
-        username = (EditText) view.findViewById(R.id.etUsername);
-        password = (EditText) view.findViewById(R.id.etPassword);
+        username = view.findViewById(R.id.etUsername);
+        password = view.findViewById(R.id.etPassword);
 
         view.findViewById(R.id.btnLogin).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,15 +62,15 @@ public class LoginFragment extends Fragment {
                                         intent.putExtra("loggedIn", true);
                                         getActivity().finish();
                                         startActivity(intent);
-                                        Toast.makeText(getActivity(), "Successful", Toast.LENGTH_LONG).show();
-                                    }else{
-                                        Toast.makeText(getActivity(), task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                        Toast.makeText(getActivity(), "Successful authentication", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(getActivity(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                                     }
                                 }
                             });
                 }
                 else {
-                    Toast.makeText(getActivity(), "Please enter a username and password", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), "Please enter a username and password", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -84,10 +84,10 @@ public class LoginFragment extends Fragment {
                     public void onComplete(@NonNull Task<AuthResult> task) {
 
                         if(task.isSuccessful()){
-                            Toast.makeText(getActivity(), "Registration Successful", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getActivity(), "Registration Successful", Toast.LENGTH_SHORT).show();
 
-                        } else{
-                            Toast.makeText(getActivity(), task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(getActivity(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                         }
 
                     }

@@ -2,6 +2,7 @@ package com.quickd.quickdestinations;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -18,15 +19,32 @@ import android.view.MenuItem;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
+import java.util.PriorityQueue;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    public ArrayList<Pair<String, String>> destinations = new ArrayList<>();
+    public ArrayList<Pair<String, Integer>> destinations = new ArrayList<>();
     public ArrayList<Pair<String, LatLng>> latLngs = new ArrayList<>();
+    public PriorityQueue<SetTimedDest> timedLatLngs = new PriorityQueue<>();
     public static boolean homeState = false;
     public static boolean loggedIn = false;
     public Bundle fragmentArgs;
+
+    public class SetTimedDest implements Comparable<SetTimedDest>{
+        public String destination;
+        public LatLng latLong;
+        public int minuteTime;
+        public SetTimedDest(String destination, LatLng latLong, int minuteTime){
+            this.destination = destination;
+            this.latLong = latLong;
+            this.minuteTime = minuteTime;
+        }
+        @Override
+        public int compareTo(SetTimedDest other) {
+            return this.minuteTime - other.minuteTime;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,20 +71,20 @@ public class MainActivity extends AppCompatActivity
 
         latLngs.add(null);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         DrawerLayout drawer;
         if (loggedIn == true)
-            drawer = (DrawerLayout) findViewById(R.id.logout_layout);
+            drawer = findViewById(R.id.logout_layout);
         else
-            drawer = (DrawerLayout) findViewById(R.id.login_layout);
+            drawer = findViewById(R.id.login_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
     }
 
@@ -74,9 +92,9 @@ public class MainActivity extends AppCompatActivity
     public void onBackPressed() {
         DrawerLayout drawer;
         if (loggedIn == true)
-            drawer = (DrawerLayout) findViewById(R.id.logout_layout);
+            drawer = findViewById(R.id.logout_layout);
         else
-            drawer = (DrawerLayout) findViewById(R.id.login_layout);
+            drawer = findViewById(R.id.login_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -124,7 +142,7 @@ public class MainActivity extends AppCompatActivity
             finish();
             startActivity(intent);
         } else if (id == R.id.nav_start) {
-            fragment = new NavigationFragment();
+                fragment = new NavigationFragment();
         } else if (id == R.id.nav_description) {
 
         } else if (id == R.id.nav_license) {
@@ -148,26 +166,34 @@ public class MainActivity extends AppCompatActivity
 
         DrawerLayout drawer;
         if (loggedIn == true)
-            drawer = (DrawerLayout) findViewById(R.id.logout_layout);
+            drawer = findViewById(R.id.logout_layout);
         else
-            drawer = (DrawerLayout) findViewById(R.id.login_layout);
+            drawer = findViewById(R.id.login_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
-    public void rmDestinations(int position){
-
-        destinations.remove(position);
-        latLngs.remove(position+1);
-
+    public void setDestinations(Pair<String, Integer> destination) {
+        destinations.add(destination);
     }
 
-    public ArrayList<Pair<String, String>> getDestinations() {
+    public ArrayList<Pair<String, Integer>> getDestinations() {
         return destinations;
     }
 
-    public void setDestinations(Pair<String, String> destination) {
-        destinations.add(destination);
+    public void rmDestinations(int i){
+        destinations.remove(i);
+        latLngs.remove(i+1);
+    }
+
+    public void setTimedLatLngs(String name, LatLng latLng, int minuteTime){
+        timedLatLngs.add(new SetTimedDest(name, latLng, minuteTime));
+    }
+
+    public PriorityQueue<SetTimedDest> getTimedLatLngs(){ return timedLatLngs; }
+
+    public void setLatLngs(Pair<String, LatLng> latLng) {
+        latLngs.add(latLng);
     }
 
     public ArrayList<Pair<String, LatLng>> getLatLngs() {
@@ -176,10 +202,6 @@ public class MainActivity extends AppCompatActivity
 
     public void setCurrentLocation(Pair<String, LatLng> latLng) {
         latLngs.set(0, latLng);
-    }
-
-    public void setLatLngs(Pair<String, LatLng> latLng) {
-        latLngs.add(latLng);
     }
 
     public void saveFragmentState(Bundle args) {

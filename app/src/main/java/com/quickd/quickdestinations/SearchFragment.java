@@ -3,6 +3,7 @@ package com.quickd.quickdestinations;
 
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -30,8 +31,9 @@ public class SearchFragment extends Fragment {
 
     private EditText arrivalTime;
     String name;
-    String location;
+    String location = "";
     LatLng latLng;
+    int minuteTime = -1;
 
     public SearchFragment() {
         // Required empty public constructor
@@ -48,7 +50,7 @@ public class SearchFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        arrivalTime = (EditText) view.findViewById(R.id.etArrivalTime);
+        arrivalTime = view.findViewById(R.id.etArrivalTime);
 
         final SupportPlaceAutocompleteFragment autocompleteFragment = (SupportPlaceAutocompleteFragment)
                 getChildFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
@@ -58,7 +60,6 @@ public class SearchFragment extends Fragment {
                 name = place.getName().toString();
                 location = place.getAddress().toString();
                 latLng = place.getLatLng();
-                Toast.makeText(getActivity(), location, Toast.LENGTH_LONG).show();
             }
 
             @Override
@@ -77,22 +78,24 @@ public class SearchFragment extends Fragment {
         view.findViewById(R.id.btnAdd).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String time = arrivalTime.getText().toString();
-                if (!location.isEmpty() && (location.trim().length() > 0))
-                {
-                    ((MainActivity) getActivity()).setDestinations(new Pair(location, time));
+                //String time = arrivalTime.getText().toString();
+                if (location.trim().length() > 0) {
+                    ((MainActivity) getActivity()).setDestinations(new Pair(location, minuteTime));
+                    if(minuteTime > -1)
+                        ((MainActivity) getActivity()).setTimedLatLngs(name, latLng, minuteTime);
                     ((MainActivity) getActivity()).setLatLngs(new Pair(name, latLng));
-                }
-                else
-                    Toast.makeText(getActivity(), "INVALID LOCATION: Try again", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Successfully added destination", Toast.LENGTH_SHORT).show();
+                } else
+                    Toast.makeText(getActivity(), "Please enter a destination", Toast.LENGTH_SHORT).show();
                 autocompleteFragment.setText("");
                 arrivalTime.setText("");
+                minuteTime = -1;
+                location = "";
             }
         });
     }
 
     public Dialog createDialog(int id) {
-
         // Get the calander
         Calendar c = Calendar.getInstance();
 
@@ -102,7 +105,16 @@ public class SearchFragment extends Fragment {
 
         if (id == TIME_ID) {
             // Open the timepicker dialog
-            return new TimePickerDialog(getActivity(), R.style.MySpinnerTimePickerStyle, time_listener, hour, minute, false);
+            TimePickerDialog timePickerDialog =
+                    new TimePickerDialog(getActivity(), R.style.MySpinnerTimePickerStyle, time_listener, hour, minute, false);
+            timePickerDialog.setButton(-3, "Clear", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    arrivalTime.setText("");
+                    minuteTime = -1;
+                }
+            });
+            return timePickerDialog;
         }
         return null;
     }
@@ -112,6 +124,7 @@ public class SearchFragment extends Fragment {
         @Override
         public void onTimeSet(TimePicker view, int hour, int minute) {
             // store the data in one string and set it to text
+            minuteTime = (hour*60) + minute;
             String time = String.valueOf(hour) + ":" + String.valueOf(minute);
             arrivalTime.setText(time);
         }
