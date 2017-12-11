@@ -2,6 +2,7 @@ package com.quickd.quickdestinations;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -29,7 +30,8 @@ public class MainActivity extends AppCompatActivity
     public ArrayList<Pair<String, LatLng>> latLngs = new ArrayList<>();
     public static boolean homeState = false;
     public static boolean loggedIn = false;
-    public static boolean startup = true;
+    public boolean startup = true;
+    public boolean splashing = false;
     private ImageView splashImageView;
     public Bundle fragmentArgs;
 
@@ -37,54 +39,70 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        /*
+        splashImageView = new ImageView(this);
+        splashImageView.setScaleType(ImageView.ScaleType.FIT_XY);
+        splashImageView.setImageResource(R.drawable.splash);
+        setContentView(splashImageView);
+        splashing = true;
+        Handler h = new Handler();
+        h.postDelayed(new Runnable() {
+            public void run() {
+
+            }
+        }, 3000);
+        */
+
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             loggedIn = extras.getBoolean("loggedIn");
         }
 
         Fragment fragment;
+        DrawerLayout drawer;
         if (loggedIn == true) {
             setContentView(R.layout.activity_logout);
             fragment = new NavigationFragment();
+            drawer = findViewById(R.id.logout_layout);
         }
         else {
             setContentView(R.layout.activity_login);
             fragment = new LoginFragment();
+            drawer = findViewById(R.id.login_layout);
         }
+
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.screen_area, fragment);
         fragmentTransaction.commit();
 
-        latLngs.add(null);
-
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer;
-        if (loggedIn == true)
-            drawer = findViewById(R.id.logout_layout);
-        else
-            drawer = findViewById(R.id.login_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                MainActivity.this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        navigationView.setNavigationItemSelectedListener(MainActivity.this);
+
+        latLngs.add(null);
+        splashing = false;
     }
 
     @Override
     public void onBackPressed() {
         DrawerLayout drawer;
+        /*if (splashing)
+            return;*/
         if (loggedIn == true)
             drawer = findViewById(R.id.logout_layout);
         else
             drawer = findViewById(R.id.login_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
+        if (drawer.isDrawerOpen(GravityCompat.START))
             drawer.closeDrawer(GravityCompat.START);
-        } else {
+        else {
             if (homeState)
                 homeState = false;
             super.onBackPressed();
@@ -117,8 +135,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        int id = item.getItemId();
         Fragment fragment = null;
+        int id = item.getItemId();
 
         if (id == R.id.nav_login) {
             // Handle the login action

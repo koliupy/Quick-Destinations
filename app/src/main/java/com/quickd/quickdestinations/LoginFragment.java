@@ -18,6 +18,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -79,25 +80,35 @@ public class LoginFragment extends Fragment {
         view.findViewById(R.id.btnRegister).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                (mAuth.createUserWithEmailAndPassword(username.getText().toString(), password.getText().toString())).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
+                if (!TextUtils.isEmpty(username.getText()) && !TextUtils.isEmpty(password.getText())) {
+                    (mAuth.createUserWithEmailAndPassword(username.getText().toString(), password.getText().toString()))
+                            .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    if(task.isSuccessful()){
+                                        Toast.makeText(getActivity(), "Registration Successful", Toast.LENGTH_SHORT).show();
 
-                        if(task.isSuccessful()){
-                            Toast.makeText(getActivity(), "Registration Successful", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(getActivity(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
 
-                        } else {
-                            Toast.makeText(getActivity(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-
-                    }
-                });
+                                }
+                            });
+                }
+                else {
+                    Toast.makeText(getActivity(), "Please enter a username and password", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
         view.findViewById(R.id.btnSkip).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+                FirebaseAuth mAuth = FirebaseAuth.getInstance();
+                if(firebaseUser != null){
+                    mAuth.signOut();
+                }
                 Fragment fragment = new NavigationFragment();
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();

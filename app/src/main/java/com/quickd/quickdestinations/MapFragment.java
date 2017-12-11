@@ -2,6 +2,7 @@ package com.quickd.quickdestinations;
 
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -16,6 +17,7 @@ import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,6 +48,8 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import static android.os.SystemClock.sleep;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -58,12 +62,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
 
     private GoogleMap mMap;
-    private boolean markersSet;
     private int minTime;
 
     GoogleApiClient mGoogleApiClient;
     Marker mCurrLocationMarker;
     LocationRequest mLocationRequest;
+    ProgressDialog progressDialog;
 
     LatLng origin;
     LatLng dest;
@@ -87,6 +91,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setMessage("Loading map...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
         colors.add(Color.RED);
         colors.add(Color.BLUE);
         colors.add(Color.GREEN);
@@ -95,7 +104,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         colors.add(Color.CYAN);
 
         minTime = Integer.MAX_VALUE;
-        markersSet = false;
         ShowDistanceDuration = view.findViewById(R.id.tvDistanceTime);
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -111,7 +119,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         }
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
+        final SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.map_area);
         mapFragment.getMapAsync(this);
 
@@ -160,14 +168,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
             buildGoogleApiClient();
             mMap.setMyLocationEnabled(true);
         }
-        if (!markersSet) {
-            int i = 0;
-            for (Pair<String, LatLng> temp : ((MainActivity) getActivity()).getLatLngs()) {
-                if (i != 0)
-                    mMap.addMarker(new MarkerOptions().position(temp.second).title(temp.first));
-                i++;
-            }
-            markersSet = true;
+        int i = 0;
+        for (Pair<String, LatLng> temp : ((MainActivity) getActivity()).getLatLngs()) {
+            if (i != 0)
+                mMap.addMarker(new MarkerOptions().position(temp.second).title(temp.first));
+            i++;
         }
     }
 
@@ -222,6 +227,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         if (mGoogleApiClient != null) {
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         }
+        progressDialog.dismiss();
     }
 
     @Override
@@ -261,8 +267,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_LOCATION: {
                 // If request is cancelled, the result arrays are empty.
