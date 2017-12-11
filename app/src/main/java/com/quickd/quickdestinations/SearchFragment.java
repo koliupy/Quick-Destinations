@@ -106,44 +106,48 @@ public class SearchFragment extends Fragment {
                 final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
                 DatabaseReference myRef = database.getReference();
-                final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
-                final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, itemList);
-                myRef.child("Users").child(firebaseUser.getUid()).child("Saved Location").addChildEventListener(new ChildEventListener() {
-                    @Override
-                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                if (firebaseUser != null){
+                    final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+                    final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, itemList);
+                    myRef.child("Users").child(firebaseUser.getUid()).child("Saved Location").addChildEventListener(new ChildEventListener() {
+                        @Override
+                        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 
-                        String value = dataSnapshot.getValue(String.class);
-                        itemList.add(value);
-                        adapter.notifyDataSetChanged();
-                    }
-                    @Override
-                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                            String value = dataSnapshot.getValue(String.class);
+                            itemList.add(value);
+                            adapter.notifyDataSetChanged();
+                        }
+                        @Override
+                        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
-                    }
+                        }
 
-                    @Override
-                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+                        @Override
+                        public void onChildRemoved(DataSnapshot dataSnapshot) {
 
-                    }
+                        }
 
-                    @Override
-                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                        @Override
+                        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
 
-                    }
+                        }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
 
-                    }
-                });
+                        }
+                    });
 
-                alertDialogBuilder.setAdapter(adapter, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        autocompleteFragment.setText(itemList.get(which));
-                    }
-                });
-                alertDialogBuilder.show();
+                    alertDialogBuilder.setAdapter(adapter, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            autocompleteFragment.setText(itemList.get(which));
+                        }
+                    });
+                    alertDialogBuilder.show();
+                } else{
+                    Toast.makeText(getActivity(), "This feature for only registered Users",Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
