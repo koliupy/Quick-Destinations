@@ -17,6 +17,8 @@ import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,6 +41,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.quickd.quickdestinations.POJO.Example;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import retrofit2.Call;
@@ -62,7 +65,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
     private int minTime;
 
     GoogleApiClient mGoogleApiClient;
-    Marker mCurrLocationMarker;
+    //Marker mCurrLocationMarker;
     LocationRequest mLocationRequest;
     ProgressDialog progressDialog;
 
@@ -71,6 +74,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
     TextView ShowDistanceDuration;
     ArrayList<Integer> colors = new ArrayList<>();
     Polyline line;
+
+    boolean test;
+    boolean hasEligible;
+    int removeIndex;
 
 
     public MapFragment() {
@@ -120,21 +127,49 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                 .findFragmentById(R.id.map_area);
         mapFragment.getMapAsync(this);
 
-        view.findViewById(R.id.btnPreview).setOnClickListener(new View.OnClickListener() {
+        view.findViewById(R.id.btnStart).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Button button = view.findViewById(R.id.btnStart);
+                button.setText("Next");
 
+                minTime = Integer.MAX_VALUE;
                 int size = ((MainActivity) getActivity()).getLatLngs().size();
                 if (size > 1) {
+                    if(line != null) {
+                        line.remove();
+                        mMap.clear();
+                        //FAKE
+                        origin = ((MainActivity) getActivity()).getLatLngs().remove(removeIndex).second;
+                        //((MainActivity) getActivity()).getLatLngs().remove(removeIndex);
+                        ((MainActivity) getActivity()).getDestinations().remove(removeIndex-1);
+                        int i = 0;
+                        for (Pair<String, LatLng> temp : ((MainActivity) getActivity()).getLatLngs()) {
+                            if (i != 0)
+                                mMap.addMarker(new MarkerOptions().position(temp.second).title(temp.first));
+                            i++;
+                        }
+                    }
+                    size = ((MainActivity) getActivity()).getLatLngs().size();
                     int c = 0;
-                    origin = ((MainActivity) getActivity()).getLatLngs().get(0).second;
+                    //FAKE
+                    if(line == null)
+                        origin = ((MainActivity) getActivity()).getLatLngs().get(0).second;
+
+                    //origin = ((MainActivity) getActivity()).getLatLngs().get(0).second;
 
                     for (int i = 1; i < size; i++) {
                         dest = ((MainActivity) getActivity()).getLatLngs().get(i).second;
-                        buildPolyline("driving", colors.get(c));
+                        buildPolyline("driving", colors.get(c), i);
                         if (i < colors.size() - 1) { c++; }
                         else { c = 0; }
                     }
+                    if(!hasEligible && !((MainActivity) getActivity()).getTimedLatLngs().isEmpty()){
+                        dest = ((MainActivity) getActivity()).getTimedLatLngs().remove().latLong;
+                        buildPolyline("driving", colors.get(c), 0);
+                    }
+                    else
+                        hasEligible = false;
                 }
             }
         });
@@ -203,17 +238,21 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void onLocationChanged(Location location) {
+        /*
         if (mCurrLocationMarker != null) {
             mCurrLocationMarker.remove();
         }
+        */
 
         //Place current location marker
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        /*
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
         markerOptions.title("Current Position");
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
         mCurrLocationMarker = mMap.addMarker(markerOptions);
+        */
         ((MainActivity) getActivity()).setCurrentLocation(new Pair("Me", latLng));
 
         //move map camera
@@ -293,7 +332,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         }
     }
 
-    private void buildPolyline(String type, final int c) {
+    private void buildPolyline(final String type, final int c, final int index) {
 
         String url = "https://maps.googleapis.com/maps/";
 
@@ -317,19 +356,22 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                         String time = response.body().getRoutes().get(i).getLegs().get(i).getDuration().getText();
                         int timeTemp = Integer.parseInt(time.substring(0, time.indexOf(" ")));
                         if(timeTemp <= minTime) {
-                            minTime = timeTemp;
-                            if(line != null)
-                                line.remove();
-                            ShowDistanceDuration.setText("Distance:" + distance + ", Duration:" + time);
-                            String encodedString = response.body().getRoutes().get(0).getOverviewPolyline().getPoints();
-                            List<LatLng> list = parsePolyline(encodedString);
-                            line = mMap.addPolyline(new PolylineOptions()
-                                    .addAll(list)
-                                    .width(5)
-                                    //.color(Color.RED)
-                                    .color(c)
-                                    .geodesic(true)
-                            );
+                            if(isEligible(dest, timeTemp, type)) {
+                                minTime = timeTemp;
+                                if(line != null)
+                                    line.remove();
+                                removeIndex = index;
+                                ShowDistanceDuration.setText("Distance:" + distance + ", Duration:" + time);
+                                String encodedString = response.body().getRoutes().get(0).getOverviewPolyline().getPoints();
+                                List<LatLng> list = parsePolyline(encodedString);
+                                line = mMap.addPolyline(new PolylineOptions()
+                                        .addAll(list)
+                                        .width(5)
+                                        //.color(Color.RED)
+                                        .color(c)
+                                        .geodesic(true)
+                                );
+                            }
                         }
                     }
                 } catch (Exception e) {
@@ -391,5 +433,62 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
             return false;
         }
         return true;
+    }
+
+    public boolean isEligible(LatLng latLong, final int firstTime, String type){
+        return true;
+        /*
+        if(((MainActivity) getActivity()).getTimedLatLngs().isEmpty()) {
+            hasEligible = true;
+            return true;
+        }
+        else {
+            LatLng temp = ((MainActivity) getActivity()).getTimedLatLngs().peek().latLong;
+            if(latLong.equals(temp))
+                return false;
+            final int maxTime = ((MainActivity) getActivity()).getTimedLatLngs().peek().minuteTime;
+            test = false;
+
+            int hour = Calendar.getInstance().get(Calendar.HOUR);
+            int min = Calendar.getInstance().get(Calendar.MINUTE);
+            min += hour*60;
+            final int currTime = min;
+            String url = "https://maps.googleapis.com/maps/";
+
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(url)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+
+            RetrofitMaps service = retrofit.create(RetrofitMaps.class);
+
+            Call<Example> call = service.getDistanceDuration("metric", latLong.latitude + "," + latLong.longitude,
+                    temp.latitude + "," + temp.longitude, type);
+            call.enqueue(new Callback<Example>() {
+                @Override
+                public void onResponse(Call<Example> call, Response<Example> response) {
+                    try {
+                        //Remove previous line from map
+                        // This loop will go through all the results and add marker on each location.
+                        String time = response.body().getRoutes().get(0).getLegs().get(0).getDuration().getText();
+                        int timeTemp = Integer.parseInt(time.substring(0, time.indexOf(" ")));
+                        if(timeTemp + firstTime + currTime <= maxTime-15){
+                            test = true;
+                            hasEligible = true;
+                        }
+                    } catch (Exception e) {
+                        Log.d("onResponse", "There is an error");
+                        e.printStackTrace();
+                    }
+                }
+                @Override
+                public void onFailure(Call<Example> call, Throwable t) {
+                    Log.d("onFailure", t.toString());
+                }
+            });
+            //String time = response.body().getRoutes().get(0).getLegs().get(0).getDuration().getText();
+            return test;
+        }
+        */
     }
 }

@@ -22,12 +22,14 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
+import java.util.PriorityQueue;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     public ArrayList<Pair<String, String>> destinations = new ArrayList<>();
     public ArrayList<Pair<String, LatLng>> latLngs = new ArrayList<>();
+    public PriorityQueue<SetTimedDest> timedLatLngs = new PriorityQueue<>();
     public static boolean homeState = false;
     public static boolean loggedIn = false;
     public boolean startup = true;
@@ -182,6 +184,27 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    public class SetTimedDest implements Comparable<SetTimedDest> {
+        public String destination;
+        public LatLng latLong;
+        public int minuteTime;
+        public SetTimedDest(String destination, LatLng latLong, int minuteTime){
+            this.destination = destination;
+            this.latLong = latLong;
+            this.minuteTime = minuteTime;
+        }
+        @Override
+        public int compareTo(SetTimedDest other) {
+            return this.minuteTime - other.minuteTime;
+        }
+    }
+
+    public void setTimedLatLngs(String name, LatLng latLng, int minuteTime){
+        timedLatLngs.add(new SetTimedDest(name, latLng, minuteTime));
+    }
+
+    public PriorityQueue<SetTimedDest> getTimedLatLngs(){ return timedLatLngs; }
 
     public void setDestinations(Pair<String, String> destination) {
         destinations.add(destination);

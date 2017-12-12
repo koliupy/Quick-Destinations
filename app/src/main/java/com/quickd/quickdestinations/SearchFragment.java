@@ -5,6 +5,8 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -31,8 +33,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -41,9 +45,12 @@ public class SearchFragment extends Fragment {
     private static final int TIME_ID = 0;
 
     private EditText arrivalTime;
-    String name;
+
     String location = "";
+    String name;
     LatLng latLng;
+
+    int minuteTime = -1;
 
     public SearchFragment() {
         // Required empty public constructor
@@ -86,9 +93,10 @@ public class SearchFragment extends Fragment {
         view.findViewById(R.id.btnAdd).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String time = arrivalTime.getText().toString();
                 if (location.trim().length() > 0) {
-                    ((MainActivity) getActivity()).setDestinations(new Pair(location, time));
+                    if(minuteTime > -1)
+                        ((MainActivity) getActivity()).setTimedLatLngs(name, latLng, minuteTime);
+                    ((MainActivity) getActivity()).setDestinations(new Pair(location, minuteTime));
                     ((MainActivity) getActivity()).setLatLngs(new Pair(name, latLng));
                     Toast.makeText(getActivity(), "Successfully added destination", Toast.LENGTH_SHORT).show();
                 } else
@@ -96,6 +104,7 @@ public class SearchFragment extends Fragment {
                 autocompleteFragment.setText("");
                 arrivalTime.setText("");
                 location = "";
+                minuteTime = -1;
             }
         });
 
@@ -142,6 +151,19 @@ public class SearchFragment extends Fragment {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             autocompleteFragment.setText(itemList.get(which));
+                            location = itemList.get(which);
+                            List<Address> addressList = null;
+                            Geocoder geocoder = new Geocoder(getActivity());
+                            try {
+                                addressList = geocoder.getFromLocationName(location, 1);
+                            }
+                            catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            Address address = addressList.get(0);
+                            LatLng latLng1 = new LatLng(address.getLatitude(), address.getLongitude());
+                            latLng = latLng1;
+                            name = address.getFeatureName();
                         }
                     });
                     alertDialogBuilder.show();
@@ -172,6 +194,7 @@ public class SearchFragment extends Fragment {
         @Override
         public void onTimeSet(TimePicker view, int hour, int minute) {
             // store the data in one string and set it to text
+            minuteTime = (hour*60) + minute;
             String time = String.valueOf(hour) + ":" + String.valueOf(minute);
             arrivalTime.setText(time);
         }
